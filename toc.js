@@ -4,6 +4,11 @@
  * Description: Generates a beautiful standalone Table of Contents page from the current webpage's headings.
  */
 
+// Import shared utilities
+const edgeUtilsScript = document.createElement('script');
+edgeUtilsScript.src = chrome.runtime.getURL('edge-utils.js');
+document.head.appendChild(edgeUtilsScript);
+
 (function () {
   'use strict';
 
@@ -113,48 +118,17 @@
         margin-top: 15px;
         display: none;
       }
-      .toast {
-        position: fixed;
-        bottom: 20px;
-        right: 20px;
-        background-color: rgba(0,0,0,0.8);
-        color: white;
-        padding: 12px 20px;
-        border-radius: 4px;
-        opacity: 0;
-        transition: opacity 0.3s;
-        z-index: 10000;
-        font-size: 0.9em;
-      }
-      .toast.show {
-        opacity: 1;
-      }
     `,
   };
 
-  // Helper function to create a toast notification
-  function showToast(message) {
-    // Remove any existing toast
-    const existingToast = document.getElementById('toc-toast');
-    if (existingToast) {
-      existingToast.remove();
-    }
-
-    const toast = document.createElement('div');
-    toast.id = 'toc-toast';
-    toast.className = 'toast';
-    toast.textContent = message;
-    document.body.appendChild(toast);
-
-    // Trigger reflow to enable transition
-    void toast.offsetWidth;
-    toast.classList.add('show');
-
-    // Hide after 3 seconds
-    setTimeout(() => {
-      toast.classList.remove('show');
-      setTimeout(() => toast.remove(), 300);
-    }, 3000);
+  // Helper function to create a toast notification (shared)
+  function showToast(message, bg = '#6366f1') {
+    const t = document.createElement('div');
+    t.style.cssText = `position:fixed;bottom:24px;left:50%;transform:translateX(-50%);background:${bg};color:#fff;padding:12px 24px;border-radius:8px;z-index:2147483647;font-family:system-ui;font-size:14px;box-shadow:0 10px 25px rgba(0,0,0,0.2);opacity:0;transition:0.3s;`;
+    t.textContent = message;
+    document.body.appendChild(t);
+    setTimeout(() => t.style.opacity = '1', 10);
+    setTimeout(() => { t.style.opacity = '0'; setTimeout(() => t.remove(), 300); }, 2500);
   }
 
   // Extract headings from the current document
@@ -343,8 +317,8 @@
         return;
       }
 
-      newWindow.document.write(tocPageContent);
-      newWindow.document.close();
+      const blob = new Blob([tocPageContent], {type: 'text/html'});
+      newWindow.location.href = URL.createObjectURL(blob);
 
       // Show a toast on the original page
       showToast('Table of Contents generated in a new tab!');
