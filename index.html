@@ -1,0 +1,235 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>toc — beautiful Table of Contents</title>
+  <meta name="description" content="One bookmarklet. Instantly generates a clean, standalone Table of Contents page from any long article or documentation.">
+  <meta property="og:title" content="toc — beautiful Table of Contents">
+  <meta property="og:description" content="One click. Beautiful standalone TOC. Perfect for long-form content.">
+  <meta property="og:url" content="https://edgeof8.github.io/toc/">
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      background: #0d1117;
+      color: #e6edf3;
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 3rem;
+      padding: 4rem 2rem 5rem;
+      text-align: center;
+    }
+    .hero { display: flex; flex-direction: column; align-items: center; gap: 1rem; }
+    .brand {
+      font-size: 4rem;
+      font-weight: 800;
+      letter-spacing: -0.05em;
+      color: #58a6ff;
+      text-shadow: 0 0 60px rgba(88, 166, 255, 0.35);
+    }
+    .tagline {
+      font-size: 1.2rem;
+      font-weight: 500;
+      color: #e6edf3;
+      max-width: 480px;
+      line-height: 1.5;
+    }
+    .sub-tagline { color: #6e7681; font-size: 0.92rem; }
+    .features {
+      display: flex;
+      gap: 0.5rem;
+      flex-wrap: wrap;
+      justify-content: center;
+    }
+    .feature-badge {
+      display: inline-flex;
+      align-items: center;
+      padding: 0.3rem 0.8rem;
+      border-radius: 99px;
+      font-size: 0.78rem;
+      font-weight: 600;
+      border: 1px solid rgba(88,166,255,0.6);
+      background: rgba(88,166,255,0.08);
+      color: #58a6ff;
+      letter-spacing: 0.01em;
+    }
+    .install {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 0.9rem;
+    }
+    .label {
+      font-size: 0.78rem;
+      text-transform: uppercase;
+      letter-spacing: 0.1em;
+      color: #6e7681;
+    }
+    .bookmarklet {
+      display: inline-block;
+      padding: 0.85rem 2.25rem;
+      background: #1f6feb;
+      color: #ffffff;
+      font-size: 1.1rem;
+      font-weight: 600;
+      border-radius: 8px;
+      text-decoration: none;
+      border: 1px solid #58a6ff;
+      cursor: grab;
+      user-select: none;
+      transition: background 0.15s, box-shadow 0.15s, transform 0.1s;
+    }
+    .bookmarklet:hover {
+      background: #58a6ff;
+      box-shadow: 0 0 28px rgba(88, 166, 255, 0.4);
+    }
+    .bookmarklet:active { cursor: grabbing; transform: scale(0.97); }
+    .drag-hint { font-size: 0.78rem; color: #484f58; margin-top: -0.25rem; }
+    .arrow {
+      font-size: 1.4rem;
+      animation: bounce 1.4s ease-in-out infinite;
+      color: #484f58;
+    }
+    @keyframes bounce {
+      0%, 100% { transform: translateY(0); }
+      50%       { transform: translateY(-5px); }
+    }
+    .bookmarks-bar {
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+      background: #161b22;
+      border: 1px solid #30363d;
+      border-radius: 6px;
+      padding: 0.45rem 1rem;
+      font-size: 0.82rem;
+      color: #484f58;
+    }
+    .bookmarks-bar .slot {
+      color: #e6edf3;
+      background: #21262d;
+      border: 1px solid #30363d;
+      border-radius: 4px;
+      padding: 0.15rem 0.6rem;
+      font-size: 0.8rem;
+      font-weight: 600;
+    }
+    .divider {
+      display: flex;
+      align-items: center;
+      gap: 1rem;
+      width: 100%;
+      max-width: 320px;
+      color: #484f58;
+      font-size: 0.78rem;
+    }
+    .divider::before, .divider::after {
+      content: '';
+      flex: 1;
+      border-top: 1px solid #21262d;
+    }
+    .copy-btn {
+      padding: 0.55rem 1.25rem;
+      background: transparent;
+      color: #8b949e;
+      font-size: 0.88rem;
+      border-radius: 8px;
+      border: 1px solid #30363d;
+      cursor: pointer;
+      transition: color 0.15s, border-color 0.15s;
+    }
+    .copy-btn:hover { color: #e6edf3; border-color: #8b949e; }
+    .copy-btn.copied { color: #58a6ff; border-color: #58a6ff; }
+    .note {
+      max-width: 480px;
+      background: #161b22;
+      border: 1px solid #30363d;
+      border-radius: 8px;
+      padding: 1rem 1.25rem;
+      font-size: 0.82rem;
+      color: #6e7681;
+      line-height: 1.6;
+    }
+    .footer { font-size: 0.82rem; color: #484f58; }
+    .footer a { color: #58a6ff; text-decoration: none; }
+    .footer a:hover { text-decoration: underline; }
+    .demo {
+      background: #161b22;
+      border: 1px solid #30363d;
+      border-radius: 8px;
+      padding: 1.5rem;
+      max-width: 520px;
+      font-size: 0.9rem;
+      color: #8b949e;
+    }
+  </style>
+</head>
+<body>
+
+  <!-- Hero -->
+  <div class="hero">
+    <div class="brand">toc</div>
+    <p class="tagline">One click.<br>Beautiful standalone Table of Contents.</p>
+    <p class="sub-tagline">Perfect for long articles, docs, research papers, and wikis.</p>
+  </div>
+
+  <!-- Feature badges -->
+  <div class="features">
+    <span class="feature-badge">Auto-detects H1–H6</span>
+    <span class="feature-badge">Clickable links</span>
+    <span class="feature-badge">Copy as Markdown</span>
+    <span class="feature-badge">Standalone page</span>
+  </div>
+
+  <!-- Demo -->
+  <div class="demo">
+    <strong>Demo:</strong> Opens a clean, centered TOC in a new tab with smooth scrolling links back to the original headings. Also offers a “Copy Markdown” button for your notes.
+  </div>
+
+  <!-- Install -->
+  <div class="install">
+    <div class="label">drag this to your bookmarks bar</div>
+    <a id="toc-link" class="bookmarklet" href="#">toc</a>
+    <div class="arrow">&#8595;</div>
+    <div class="bookmarks-bar">
+      &#128278; Bookmarks &nbsp;&nbsp; <span class="slot">toc</span> &nbsp;&nbsp; &#183;&#183;&#183;
+    </div>
+    <div class="drag-hint">then visit any long page and click it</div>
+  </div>
+
+  <div class="divider">can't drag?</div>
+
+  <button class="copy-btn" id="copy-btn">Copy code — paste as bookmark URL</button>
+
+  <div class="note">
+    Scans the page for all headings (H1–H6), builds a hierarchical TOC, opens it in a new tab, and gives you the option to copy it as Markdown for your PKM tools.
+  </div>
+
+  <p class="footer">
+    <a href="https://github.com/edgeof8">github.com/edgeof8</a>
+  </p>
+
+  <!-- bookmarklet source (self-contained minified version from demo) -->
+  <script id="toc-code" type="text/plain">javascript:!function()%7B%22use%20strict%22%3Bvar%20n%2Ct%2Ce%2Co%2Cr%2Ci%3D%22Table%20of%20Contents%22%2Cc%3D%5B%5D%3Bdocument.querySelectorAll(%22h1%2Ch2%2Ch3%2Ch4%2Ch5%2Ch6%22).forEach(function(n%2Ct)%7Bn.id%7C%7C(n.id%3D%22toc-heading-%22%2Bt)%2Cc.push(%7Blevel%3A%2Bn.tagName.charAt(1)%2Ctext%3An.textContent.trim()%2Cid%3An.id%7D)%7D)%3Btry%7Bvar%20l%3D(t%3Dfunction(n)%7Breturn%20n.length%3F%22%3Cul%3E%22%2Bn.map(function%20n(t)%7Bvar%20e%3D%27%3Cli%20class%3D%22l%27%2Bt.level%2B%27%22%3E%3Ca%20href%3D%22%23%27%2Bt.id%2B%27%22%3E%27%2Bt.text%2B%22%3C%2Fa%3E%22%3Breturn%20t.children.length%26%26(e%2B%3D%22%3Cul%3E%22%2Ct.children.forEach(function(t)%7Be%2B%3Dn(t)%7D)%2Ce%2B%3D%22%3C%2Ful%3E%22)%2Ce%2B%22%3C%2Fli%3E%22%7D).join(%22%22)%2B%22%3C%2Ful%3E%22%3A%22%22%7D(n%3Dfunction(n)%7Bif(!n.length)return%5B%5D%3Bvar%20t%3D%7Blevel%3A0%2Cchildren%3A%5B%5D%7D%2Ce%3D%5Bt%5D%3Breturn%20n.forEach(function(n)%7Bfor(%3Be%5Be.length-1%5D.level%3E%3Dn.level%3B)e.pop()%3Bvar%20t%3D%7B...n%2Cchildren%3A%5B%5D%7D%3Be%5Be.length-1%5D.children.push(t)%2Ce.push(t)%7D)%2Ct.children%7D(c))%2Ce%3Dfunction(n)%7Bvar%20t%3D%22%22%3Bfunction%20e(n%2Co)%7Bt%2B%3D%22%20%20%22.repeat(o)%2B%22-%20%5B%22%2Bn.text%2B%22%5D(%23%22%2Bn.id%2B%22)%5Cn%22%2Cn.children.forEach(function(n)%7Be(n%2Co%2B1)%7D)%7Dreturn%20n.forEach(function(n)%7Be(n%2C0)%7D)%2Ct.trim()%7D(n)%2Co%3Dt%7C%7C%27%3Cp%20style%3D%22text-align%3Acenter%3Bcolor%3A%23666%3Bfont-style%3Aitalic%3B%22%3ENo%20headings%20found.%3C%2Fp%3E%27%2C%27%5Cn%3C!DOCTYPE%20html%3E%5Cn%3Chtml%3E%5Cn%3Chead%3E%5Cn%3Cmeta%20charset%3D%22UTF-8%22%3E%5Cn%3Ctitle%3E%27%2Bi%2B%22%20-%20%22%2B(r%3Ddocument.title%7C%7C%22Untitled%22)%2B%22%3C%2Ftitle%3E%5Cn%3Cstyle%3E%5Cnbody%7Bfont-family%3Asans-serif%3Bbackground%3A%23fff%3Bcolor%3A%23222%3Bpadding%3A20px%3Bline-height%3A1.6%7D%5Cnh1%7Bfont-size%3A1.8em%3Bmargin-bottom%3A10px%7D%5Cn%23toc%7Bmax-width%3A800px%3Bmargin%3Aauto%7D%5Cn%23toc%20ul%7Blist-style%3Anone%3Bpadding%3A0%7D%5Cn%23toc%20li%7Bmargin%3A8px%200%7D%5Cn%23toc%20a%7Btext-decoration%3Anone%3Bcolor%3A%23222%3Bborder-bottom%3A1px%20dotted%20transparent%7D%5Cn%23toc%20a%3Ahover%7Bcolor%3A%230066cc%3Bborder-bottom-color%3A%230066cc%7D%5Cn.button%7Bbackground%3A%230066cc%3Bcolor%3A%23fff%3Bborder%3Anone%3Bpadding%3A8px%2016px%3Bborder-radius%3A4px%3Bcursor%3Apointer%7D%5Cn.button%3Ahover%7Bbackground%3A%230052a3%7D%5Cn%3C%2Fstyle%3E%5Cn%3C%2Fhead%3E%5Cn%3Cbody%3E%5Cn%3Cdiv%20id%3D%22toc%22%3E%5Cn%3Ch1%3E%27%2Bi%2B%27%3C%2Fh1%3E%5Cn%27%2Bo%2B%27%5Cn%3Cbutton%20class%3D%22button%22%20onclick%3D%22navigator.clipboard.writeText(%5C%27%27%2Be.replace(%2F%5C%5Cn%2Fg%2C%27%5C%5Cn%27)%2B%5C%27%27).then(()=%3E%7Bconst%20b%3Dthis%3Bb.textContent%3D%27%u2713%20Copied%27%3BsetTimeout(()=%3Eb.textContent%3D%27Copy%20as%20Markdown%27%2C1500)%7D)%22%3ECopy%20as%20Markdown%3C%2Fbutton%3E%5Cn%3C%2Fdiv%3E%5Cn%3Cscript%3E%27%2B(function()%7Bdocument.querySelectorAll(%27a%5Bhref%5E%3D%22%23%22%5D%27).forEach(function(n)%7Bn.addEventListener(%27click%27%2Cfunction(t)%7Bt.preventDefault()%3Bconst%20e%3Ddocument.getElementById(n.getAttribute(%27href%27).slice(1))%3Be%26%26e.scrollIntoView(%7Bbehavior%3A%27smooth%27%7D)%7D)%7D)%7D)()%2B%27%3C%2Fscript%3E%5Cn%3C%2Fbody%3E%5Cn%3C%2Fhtml%3E%5Cn%27)%3Bvar%20a%3Dwindow.open(%22%22%2C%22_blank%22%2C%22width%3D820%2Cheight%3D620%2Cmenubar%3Dno%2Ctoolbar%3Dno%2Cstatus%3Dno%22)%3Bif(!a)return%20void%20alert(%22Please%20allow%20pop-ups%20for%20this%20site%20to%20see%20the%20Table%20of%20Contents.%22)%3Ba.document.write(l)%2Ca.document.close()%2Cfunction(n)%7Bvar%20t%3Ddocument.createElement(%22div%22)%3Bt.textContent%3Dn%2Ct.style.cssText%3D%22position:fixed%3Btop%3A20px%3Bright%3A20px%3Bpadding%3A12px%2020px%3Bborder-radius%3A8px%3Bfont%3A600%2014px%20-apple-system%2CBlinkMacSystemFont%2C%5C%22Segoe%20UI%5C%22%2Csans-serif%3Bcolor%3A%23fff%3Bz-index%3A9999999%3Bbox-shadow%3A0%204px%2020px%20rgba(0%2C0%2C0%2C.4)%3Btransition%3Aopacity%20.3s%3Bbackground%3A%2358a6ff%22%2Cdocument.body.appendChild(t)%2CsetTimeout(function()%7Bt.style.opacity%3D0%2CsetTimeout(function()%7Bt.remove()%7D%2C300)%7D%2C2500)%7D(%22%u2713%20TOC%20opened%20in%20new%20tab%22)%7Dcatch(n)%7Bconsole.error(%22toc%20error%3A%22%2Cn)%2Calert(%22An%20error%20occurred%20while%20generating%20the%20TOC.%20Please%20check%20the%20console.%22)%7D%7D()();</script>
+
+  <script>
+    const code = document.getElementById('toc-code').textContent.trim();
+    document.getElementById('toc-link').href = code;
+
+    document.getElementById('copy-btn').addEventListener('click', async () => {
+      await navigator.clipboard.writeText(code);
+      const btn = document.getElementById('copy-btn');
+      btn.textContent = '✓ Copied';
+      btn.classList.add('copied');
+      setTimeout(() => {
+        btn.textContent = 'Copy code — paste as bookmark URL';
+        btn.classList.remove('copied');
+      }, 1500);
+    });
+  </script>
+
+</body>
+</html>
